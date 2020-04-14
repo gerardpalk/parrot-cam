@@ -46,7 +46,7 @@ int hourOfDay;
 #define CON_TIMEOUT   10*1000                     // milliseconds
 
 // Not using Deep Sleep on PCB because TPL5110 timer takes over.
-#define TIME_TO_SLEEP (uint64_t)2*60*60*1000*1000   // microseconds
+#define TIME_TO_SLEEP (uint64_t)60*60*1000*1000   // microseconds
 
 #ifdef DEGUB_ESP
   #define DBG(x) Serial.println(x)
@@ -63,12 +63,12 @@ char pass[] = "bledisloe";
 
 // FTP Server credentials
 char ftp_server[] = "ftp.greenbridge.net.au";
-char ftp_user[]   = "possum_cam@greenbridge.net.au";
+char ftp_user[]   = "parrot_cam@greenbridge.net.au";
 char ftp_pass[]   = "N35a%j5TS!UG";
 
 // Camera buffer, URL and picture name
 camera_fb_t *fb = NULL;
-String pic_name = "possum";
+String pic_name = "parrot";
 
 // Variable marked with this attribute will keep its value during a deep sleep / wake cycle.
 RTC_DATA_ATTR uint64_t bootCount = 0;
@@ -196,7 +196,7 @@ void loop()
 
   if( millis() > CON_TIMEOUT)
   {
-    DBG("Back to sleep guys - Possum is out feeding");
+    DBG("Back to sleep guys - Birds are in bed");
 
     deep_sleep();
   }
@@ -214,17 +214,8 @@ void deep_sleep()
 bool take_picture()
 {
   DBG("Taking picture now");
- 
-  rtc_gpio_hold_dis(GPIO_NUM_4);
-  pinMode(4, OUTPUT);
-  digitalWrite(4, HIGH);
 
   fb = esp_camera_fb_get();  
-
-  pinMode(4, OUTPUT);
-  digitalWrite(4, LOW);
-  rtc_gpio_hold_en(GPIO_NUM_4);
-
 
   if(!fb)
   {
@@ -234,7 +225,7 @@ bool take_picture()
   
   // Rename the picture with the time string
   // pic_name += String( now() ) + ".jpg";
-  pic_name += ".jpg";
+  pic_name += "_" + String(hourOfDay) + ".jpg";
   DBG("Camera capture success, saved as:");
   DBG( pic_name );
 
